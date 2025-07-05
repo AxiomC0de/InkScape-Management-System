@@ -43,6 +43,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import com.joshua.inkscape.viewmodels.DashboardViewModel
 import com.joshua.inkscape.viewmodels.DashboardViewModelFactory
+import com.joshua.inkscape.viewmodels.TimePeriod
 import java.text.NumberFormat
 import java.util.Locale
 import androidx.compose.foundation.lazy.LazyColumn
@@ -54,7 +55,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel = viewModel(factory = DashboardViewModelFactory())
@@ -66,6 +72,7 @@ fun DashboardScreen(
     val mostSoldCategory = viewModel.mostSoldCategory.collectAsState().value
     val categoryRanking = viewModel.categoryRanking.collectAsState().value
     val salesTrend = viewModel.salesTrend.collectAsState().value
+    val selectedTimePeriod = viewModel.selectedTimePeriod.collectAsState().value
 
     Column(
         modifier = Modifier
@@ -160,10 +167,36 @@ fun DashboardScreen(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Last 7 days",
+                        text = selectedTimePeriod.label,
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                // Time period filter chips
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    TimePeriod.values().forEach { period ->
+                        FilterChip(
+                            onClick = { viewModel.setTimePeriod(period) },
+                            label = {
+                                Text(
+                                    text = period.label,
+                                    fontSize = 12.sp
+                                )
+                            },
+                            selected = selectedTimePeriod == period,
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            modifier = Modifier.height(32.dp)
+                        )
+                    }
                 }
                 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -171,7 +204,8 @@ fun DashboardScreen(
                 if (salesTrend.isNotEmpty()) {
                     CustomLineChart(
                         modifier = Modifier.fillMaxSize(),
-                        salesData = salesTrend
+                        salesData = salesTrend,
+                        timePeriod = selectedTimePeriod
                     )
                 } else {
                     Column(
@@ -468,12 +502,17 @@ fun ActivityItem(activity: Activity) {
 @Composable
 fun CustomLineChart(
     modifier: Modifier = Modifier,
-    salesData: Map<ZonedDateTime, Double>
+    salesData: Map<ZonedDateTime, Double>,
+    timePeriod: TimePeriod
 ) {
     val sortedEntries = salesData.entries.sortedBy { it.key }
     val maxValue = sortedEntries.maxOfOrNull { it.value } ?: 0.0
     val minValue = sortedEntries.minOfOrNull { it.value } ?: 0.0
-    val dateFormatter = DateTimeFormatter.ofPattern("MM/dd")
+    val dateFormatter = when (timePeriod) {
+        TimePeriod.SEVEN_DAYS -> DateTimeFormatter.ofPattern("MM/dd")
+        TimePeriod.ONE_MONTH -> DateTimeFormatter.ofPattern("MM/dd")
+        TimePeriod.ONE_YEAR -> DateTimeFormatter.ofPattern("MMM yyyy")
+    }
     
     Box(modifier = modifier) {
         Canvas(
@@ -515,8 +554,14 @@ fun CustomLineChart(
                 .padding(horizontal = 32.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            val labelInterval = when (timePeriod) {
+                TimePeriod.SEVEN_DAYS -> max(1, sortedEntries.size / 7) // Show all days for 7-day view
+                TimePeriod.ONE_MONTH -> max(1, sortedEntries.size / 6) // Show ~6 labels for month view
+                TimePeriod.ONE_YEAR -> max(1, sortedEntries.size / 6) // Show ~6 labels for year view
+            }
+            
             sortedEntries.forEachIndexed { index, entry ->
-                if (index % max(1, sortedEntries.size / 4) == 0) {
+                if (index % labelInterval == 0) {
                     Text(
                         text = entry.key.format(dateFormatter),
                         fontSize = 10.sp,

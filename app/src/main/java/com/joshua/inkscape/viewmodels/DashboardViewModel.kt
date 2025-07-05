@@ -20,6 +20,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 
+enum class TimePeriod(val label: String, val days: Long) {
+    SEVEN_DAYS("7 Days", 7),
+    ONE_MONTH("1 Month", 30),
+    ONE_YEAR("1 Year", 365)
+}
+
 class DashboardViewModel(
     private val salesRepository: SalesRepository,
     private val productRepository: ProductRepository,
@@ -31,6 +37,9 @@ class DashboardViewModel(
 
     private val products: StateFlow<List<Product>> = productRepository.getProductsFlow()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    private val _selectedTimePeriod = MutableStateFlow(TimePeriod.SEVEN_DAYS)
+    val selectedTimePeriod: StateFlow<TimePeriod> = _selectedTimePeriod.asStateFlow()
 
     private val _totalRevenue = MutableStateFlow(0.0)
     val totalRevenue: StateFlow<Double> = _totalRevenue.asStateFlow()
@@ -49,6 +58,10 @@ class DashboardViewModel(
         fetchTotalSales()
         fetchLowStockProducts()
         fetchRecentActivities()
+    }
+
+    fun setTimePeriod(timePeriod: TimePeriod) {
+        _selectedTimePeriod.value = timePeriod
     }
 
     private fun fetchTotalRevenue() {
@@ -123,17 +136,25 @@ class DashboardViewModel(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val salesTrend: StateFlow<Map<ZonedDateTime, Double>> = sales.combine(products) { salesList, _ ->
+    val salesTrend: StateFlow<Map<ZonedDateTime, Double>> = sales.combine(_selectedTimePeriod) { salesList, timePeriod ->
         salesList
             .filter {
                 try {
                     val saleDate = ZonedDateTime.parse(it.date)
-                    saleDate.isAfter(ZonedDateTime.now().minusDays(7))
+                    saleDate.isAfter(ZonedDateTime.now().minusDays(timePeriod.days))
                 } catch (e: Exception) {
                     false
                 }
             }
-            .groupBy { ZonedDateTime.parse(it.date).truncatedTo(ChronoUnit.DAYS) }
+            .groupBy { 
+                val saleDate = ZonedDateTime.parse(it.date)
+                when (timePeriod) {
+                    TimePeriod.SEVEN_DAYS -> saleDate.truncatedTo(ChronoUnit.DAYS)
+                    TimePeriod.ONE_MONTH -> saleDate.truncatedTo(ChronoUnit.DAYS)
+                    TimePeriod.ONE_YEAR -> saleDate.truncatedTo(ChronoUnit.DAYS)
+                        .withDayOfMonth(1) // Group by month for yearly view
+                }
+            }
             .mapValues { entry -> entry.value.sumOf { it.totalAmount } }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 }
