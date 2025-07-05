@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -90,51 +89,68 @@ fun DashboardScreen(
         )
     )
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            .verticalScroll(rememberScrollState())
     ) {
-        Text(
-            text = "Dashboard",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            DashboardCard("Total Revenue", "S/${NumberFormat.getNumberInstance(Locale.US).format(totalRevenue)}")
-            DashboardCard("Total Sales", totalSales.toString())
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            DashboardCard("Low Stock", lowStockProducts.toString())
+        item {
+            Text(
+                text = "Dashboard",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
-        BarChart(modifier = Modifier.height(300.dp), barChartData = barChartData)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Recent Activity",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        LazyColumn {
-            items(recentActivities) { activity ->
-                ActivityItem(activity)
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                DashboardCard("Total Revenue", "S/${NumberFormat.getNumberInstance(Locale.US).format(totalRevenue)}")
+                DashboardCard("Total Sales", totalSales.toString())
             }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                DashboardCard("Low Stock", lowStockProducts.toString())
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        item {
+            BarChart(modifier = Modifier.height(300.dp), barChartData = barChartData)
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        item {
+            Text(
+                text = "Recent Activity",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        items(recentActivities) { activity ->
+            ActivityItem(activity)
         }
     }
 }
