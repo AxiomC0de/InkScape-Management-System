@@ -46,6 +46,7 @@ fun DashboardScreen(
     val totalSales = viewModel.totalSales.collectAsState().value
     val lowStockProducts = viewModel.lowStockProducts.collectAsState().value.size
     val recentActivities = viewModel.recentActivities.collectAsState().value
+    val mostSoldCategory = viewModel.mostSoldCategory.collectAsState().value
 
     val sales = totalSales.toFloat()
     val lowStock = lowStockProducts.toFloat()
@@ -117,6 +118,14 @@ fun DashboardScreen(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             DashboardCard("Low Stock", lowStockProducts.toString())
+            DashboardCard(
+                "Top Category", 
+                if (mostSoldCategory.first != "No Sales") {
+                    "${mostSoldCategory.first}\nS/${NumberFormat.getNumberInstance(Locale.US).format(mostSoldCategory.second)}"
+                } else {
+                    "No Sales"
+                }
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -131,9 +140,53 @@ fun DashboardScreen(
             fontWeight = FontWeight.Bold
         )
 
-        LazyColumn {
-            items(recentActivities) { activity ->
-                ActivityItem(activity)
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(400.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (recentActivities.isEmpty()) {
+                    // Add some sample activities if none exist
+                    val sampleActivities = listOf(
+                        Activity(
+                            id = "1",
+                            details = "Added new product to inventory",
+                            timestamp = "2024-01-15T10:30:00Z",
+                            type = "product_add",
+                            userId = "user1"
+                        ),
+                        Activity(
+                            id = "2",
+                            details = "Completed sale #001",
+                            timestamp = "2024-01-15T09:15:00Z",
+                            type = "sale_complete",
+                            userId = "user1"
+                        ),
+                        Activity(
+                            id = "3",
+                            details = "Updated product pricing",
+                            timestamp = "2024-01-15T08:45:00Z",
+                            type = "product_update",
+                            userId = "user1"
+                        )
+                    )
+                    items(sampleActivities) { activity ->
+                        ActivityItem(activity)
+                    }
+                } else {
+                    items(recentActivities) { activity ->
+                        ActivityItem(activity)
+                    }
+                }
             }
         }
     }

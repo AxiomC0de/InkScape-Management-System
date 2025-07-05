@@ -16,20 +16,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
-import com.joshua.inkscape.data.repository.ProductRepository
-import com.joshua.inkscape.data.repository.SalesRepository
-import com.joshua.inkscape.data.model.Activity
-import com.joshua.inkscape.data.repository.ActivityRepository
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import com.joshua.inkscape.data.model.Product
 
 class DashboardViewModel(
     private val salesRepository: SalesRepository,
@@ -85,7 +74,7 @@ class DashboardViewModel(
     private fun fetchLowStockProducts() {
         viewModelScope.launch {
             productRepository.getProductsFlow().collect { products ->
-                _lowStockProducts.value = products.filter { it.stock < 5 }
+                _lowStockProducts.value = products.filter { it.quantity < 5 }
             }
         }
     }
@@ -117,6 +106,14 @@ class DashboardViewModel(
             .mapValues { entry -> entry.value.sumOf { it.second } }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 
+    val mostSoldCategory: StateFlow<Pair<String, Double>> = categorySales.combine(products) { categoryMap, _ ->
+        if (categoryMap.isEmpty()) {
+            "No Sales" to 0.0
+        } else {
+            val topCategory = categoryMap.maxByOrNull { it.value }
+            topCategory?.key ?: "Unknown" to (topCategory?.value ?: 0.0)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "No Sales" to 0.0)
 
     val salesTrend: StateFlow<Map<ZonedDateTime, Double>> = sales.combine(products) { salesList, _ ->
         salesList
