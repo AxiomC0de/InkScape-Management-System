@@ -115,6 +115,14 @@ class DashboardViewModel(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Pair("No Sales", 0.0))
 
+    val categoryRanking: StateFlow<List<Pair<String, Double>>> = categorySales.combine(products) { categoryMap, _ ->
+        if (categoryMap.isEmpty()) {
+            emptyList()
+        } else {
+            categoryMap.toList().sortedByDescending { it.second }
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     val salesTrend: StateFlow<Map<ZonedDateTime, Double>> = sales.combine(products) { salesList, _ ->
         salesList
             .filter {

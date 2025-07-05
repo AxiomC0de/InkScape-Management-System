@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
@@ -47,6 +48,7 @@ fun DashboardScreen(
     val lowStockProducts = viewModel.lowStockProducts.collectAsState().value.size
     val recentActivities = viewModel.recentActivities.collectAsState().value
     val mostSoldCategory = viewModel.mostSoldCategory.collectAsState().value
+    val categoryRanking = viewModel.categoryRanking.collectAsState().value
 
     val sales = totalSales.toFloat()
     val lowStock = lowStockProducts.toFloat()
@@ -130,6 +132,56 @@ fun DashboardScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Category Ranking Section
+        Text(
+            text = "Category Sales Ranking",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            if (categoryRanking.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "No sales data available",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(categoryRanking.size) { index ->
+                        val category = categoryRanking[index]
+                        CategoryRankingItem(
+                            rank = index + 1,
+                            categoryName = category.first,
+                            salesAmount = category.second
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         BarChart(modifier = Modifier.height(300.dp), barChartData = barChartData)
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -203,6 +255,70 @@ fun ActivityItem(activity: Activity) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = activity.details, fontWeight = FontWeight.Bold)
             Text(text = activity.timestamp, style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+@Composable
+fun CategoryRankingItem(rank: Int, categoryName: String, salesAmount: Double) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Rank indicator
+                Card(
+                    modifier = Modifier.size(32.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = when (rank) {
+                            1 -> Color(0xFFFFD700) // Gold
+                            2 -> Color(0xFFC0C0C0) // Silver
+                            3 -> Color(0xFFCD7F32) // Bronze
+                            else -> MaterialTheme.colorScheme.primaryContainer
+                        }
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = rank.toString(),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            color = when (rank) {
+                                1, 2, 3 -> Color.Black
+                                else -> MaterialTheme.colorScheme.onPrimaryContainer
+                            }
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.width(12.dp))
+                
+                Text(
+                    text = categoryName,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 16.sp
+                )
+            }
+            
+            Text(
+                text = "S/${NumberFormat.getNumberInstance(Locale.US).format(salesAmount)}",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }
