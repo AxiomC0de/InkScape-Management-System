@@ -10,11 +10,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Category
-import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -140,8 +138,8 @@ fun InventoryScreen(
                                     containerColor = MaterialTheme.colorScheme.secondary
                                 )
                             ) {
-                                Icon(
-                                    Icons.Default.Category,
+                                                            Icon(
+                                Icons.Default.Info,
                                     contentDescription = null,
                                     modifier = Modifier.size(16.dp)
                                 )
@@ -172,7 +170,7 @@ fun InventoryScreen(
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Icon(
-                                Icons.Default.Inventory2,
+                                Icons.Default.ShoppingCart,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier
@@ -235,7 +233,7 @@ fun InventoryScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Icon(
-                                Icons.Default.Inventory2,
+                                Icons.Default.ShoppingCart,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(48.dp)
@@ -387,7 +385,7 @@ fun ProductItem(product: Product, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 ProductDetailChip(
-                    icon = Icons.Default.MonetizationOn,
+                    icon = Icons.Default.Info,
                     label = "Price",
                     value = "₱${product.price}",
                     modifier = Modifier.weight(1f)
