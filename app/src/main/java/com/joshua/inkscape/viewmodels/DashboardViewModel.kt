@@ -66,8 +66,28 @@ class DashboardViewModel(
 
     private fun fetchTotalRevenue() {
         viewModelScope.launch {
-            sales.combine(products) { salesList, _ ->
-                salesList.sumOf { it.totalAmount }
+            sales.combine(products) { salesList, productList ->
+                /**
+                 * ACCURATE REVENUE CALCULATION:
+                 * Total Revenue = Product Sales Value + Service Fees
+                 * 
+                 * Components:
+                 * 1. Product Sales Value: Sum of (product.price * quantity) for all products sold
+                 * 2. Service Fees: sale.totalAmount (includes base service amount + additional fees)
+                 * 
+                 * Note: sale.totalAmount does NOT include product values, only service-related charges,
+                 * so we add both components to get the complete revenue picture.
+                 */
+                salesList.sumOf { sale ->
+                    // Product sales value (actual inventory sold)
+                    val productSalesValue = sale.productsUsed.sumOf { saleProduct ->
+                        val product = productList.find { it.id == saleProduct.productId }
+                        (product?.price ?: 0.0) * saleProduct.quantityUsed
+                    }
+                    
+                    // Total revenue for this sale = product sales + service charges
+                    productSalesValue + sale.totalAmount
+                }
             }.collect { totalRevenue ->
                 _totalRevenue.value = totalRevenue
             }
@@ -136,7 +156,7 @@ class DashboardViewModel(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val salesTrend: StateFlow<Map<ZonedDateTime, Double>> = sales.combine(_selectedTimePeriod) { salesList, timePeriod ->
+    val salesTrend: StateFlow<Map<ZonedDateTime, Double>> = combine(sales, _selectedTimePeriod, products) { salesList, timePeriod, productList ->
         salesList
             .filter {
                 try {
@@ -155,7 +175,16 @@ class DashboardViewModel(
                         .withDayOfMonth(1) // Group by month for yearly view
                 }
             }
-            .mapValues { entry -> entry.value.sumOf { it.totalAmount } }
+            .mapValues { entry -> 
+                entry.value.sumOf { sale ->
+                    // Use same accurate calculation as total revenue: product sales + service fees
+                    val productSalesValue = sale.productsUsed.sumOf { saleProduct ->
+                        val product = productList.find { it.id == saleProduct.productId }
+                        (product?.price ?: 0.0) * saleProduct.quantityUsed
+                    }
+                    productSalesValue + sale.totalAmount
+                }
+            }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 }
 
