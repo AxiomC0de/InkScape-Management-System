@@ -108,12 +108,12 @@ class DashboardViewModel(
 
     val mostSoldCategory: StateFlow<Pair<String, Double>> = categorySales.combine(products) { categoryMap, _ ->
         if (categoryMap.isEmpty()) {
-            "No Sales" to 0.0
+            Pair("No Sales", 0.0)
         } else {
             val topCategory = categoryMap.maxByOrNull { it.value }
-            topCategory?.key ?: "Unknown" to (topCategory?.value ?: 0.0)
+            Pair(topCategory?.key ?: "Unknown", topCategory?.value ?: 0.0)
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "No Sales" to 0.0)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Pair("No Sales", 0.0))
 
     val salesTrend: StateFlow<Map<ZonedDateTime, Double>> = sales.combine(products) { salesList, _ ->
         salesList
