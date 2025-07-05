@@ -103,7 +103,7 @@ fun DashboardScreen(
         ) {
             ModernStatsCard(
                 title = "Total Revenue",
-                value = "S/${NumberFormat.getNumberInstance(Locale.US).format(totalRevenue)}",
+                value = "₱${NumberFormat.getNumberInstance(Locale("en", "PH")).format(totalRevenue)}",
                 subtitle = "This month",
                 color = Color(0xFF4CAF50),
                 modifier = Modifier.weight(1f)
@@ -134,7 +134,7 @@ fun DashboardScreen(
             ModernStatsCard(
                 title = "Top Category",
                 value = mostSoldCategory.first,
-                subtitle = "S/${NumberFormat.getNumberInstance(Locale.US).format(mostSoldCategory.second)}",
+                subtitle = "₱${NumberFormat.getNumberInstance(Locale("en", "PH")).format(mostSoldCategory.second)}",
                 color = Color(0xFF9C27B0),
                 modifier = Modifier.weight(1f)
             )
@@ -460,7 +460,7 @@ fun CategoryRankingItem(rank: Int, categoryName: String, salesAmount: Double) {
             }
             
             Text(
-                text = "S/${NumberFormat.getNumberInstance(Locale.US).format(salesAmount)}",
+                text = "₱${NumberFormat.getNumberInstance(Locale("en", "PH")).format(salesAmount)}",
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.primary
@@ -538,7 +538,7 @@ fun CustomLineChart(
             for (i in 5 downTo 0) {
                 val value = (maxValue * i / 5).toInt()
                 Text(
-                    text = if (value > 0) "S/$value" else "S/0",
+                    text = if (value > 0) "₱$value" else "₱0",
                     fontSize = 10.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f)

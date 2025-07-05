@@ -181,7 +181,7 @@ fun SaleItem(sale: Sale, products: List<Product>, onClick: () -> Unit) {
 
             Text(text = "Sale ID: ${sale.id}", style = MaterialTheme.typography.titleMedium)
             Text(text = "Date: $formattedDate", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Total Amount: $${sale.totalAmount}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Total Amount: ₱${sale.totalAmount}", style = MaterialTheme.typography.bodyMedium)
             Text(text = "Payment Method: ${sale.paymentStatus.replaceFirstChar { it.uppercase() }}", style = MaterialTheme.typography.bodyMedium)
 
             // Display sold items
@@ -192,7 +192,7 @@ fun SaleItem(sale: Sale, products: List<Product>, onClick: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(text = "${product?.name ?: "Unknown Product"} (x${item.quantityUsed})")
-                    Text(text = "$${product?.price?.times(item.quantityUsed)}")
+                    Text(text = "₱${product?.price?.times(item.quantityUsed)}")
                 }
             }
         }

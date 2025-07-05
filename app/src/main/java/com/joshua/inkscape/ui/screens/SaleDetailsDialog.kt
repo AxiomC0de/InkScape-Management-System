@@ -285,5 +285,5 @@ private fun DialogButtons(sale: Sale, onDismiss: () -> Unit, onDelete: () -> Uni
 }
 
 private fun formatCurrency(amount: Double): String {
-    return "₱${NumberFormat.getNumberInstance(Locale.US).format(amount)}"
+    return "₱${NumberFormat.getNumberInstance(Locale("en", "PH")).format(amount)}"
 } 

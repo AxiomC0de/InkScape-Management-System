@@ -103,7 +103,7 @@ fun CreateSaleScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Total Amount: ₱${NumberFormat.getNumberInstance(Locale.US).format(viewModel.totalAmount)}",
+                        text = "Total Amount: ₱${NumberFormat.getNumberInstance(Locale("en", "PH")).format(viewModel.totalAmount)}",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -237,7 +237,7 @@ fun CreateSaleScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
-                    text = "Remaining: ₱${NumberFormat.getNumberInstance(Locale.US).format(viewModel.remainingAmount)}",
+                    text = "Remaining: ₱${NumberFormat.getNumberInstance(Locale("en", "PH")).format(viewModel.remainingAmount)}",
                     modifier = Modifier.align(Alignment.End)
                 )
                 Spacer(Modifier.height(16.dp))
