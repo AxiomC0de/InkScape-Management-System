@@ -31,17 +31,16 @@ import co.yml.charts.ui.barchart.BarChart
 import co.yml.charts.ui.barchart.models.BarChartData
 import co.yml.charts.ui.barchart.models.BarData
 import co.yml.charts.ui.barchart.models.BarStyle
-import co.yml.charts.ui.linechart.LineChart
-import co.yml.charts.ui.linechart.models.LineChartData
-import co.yml.charts.ui.linechart.models.LinePlotData
-import co.yml.charts.ui.linechart.models.LineStyle
-import co.yml.charts.ui.linechart.models.LineType
-import co.yml.charts.ui.linechart.models.SelectionHighlightPoint
-import co.yml.charts.ui.linechart.models.SelectionHighlightPopUp
-import co.yml.charts.ui.linechart.models.ShadowUnderLine
-import co.yml.charts.common.model.PlotType
-import co.yml.charts.ui.linechart.models.IntersectionPoint
-import co.yml.charts.ui.linechart.models.Line
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import kotlin.math.max
+import kotlin.math.min
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import com.joshua.inkscape.viewmodels.DashboardViewModel
 import com.joshua.inkscape.viewmodels.DashboardViewModelFactory
 import java.text.NumberFormat
@@ -67,9 +66,6 @@ fun DashboardScreen(
     val mostSoldCategory = viewModel.mostSoldCategory.collectAsState().value
     val categoryRanking = viewModel.categoryRanking.collectAsState().value
     val salesTrend = viewModel.salesTrend.collectAsState().value
-
-    // Convert sales trend data to line chart format
-    val lineChartData = createLineChartData(salesTrend)
 
     Column(
         modifier = Modifier
@@ -172,10 +168,10 @@ fun DashboardScreen(
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                if (lineChartData.linePlotData.lines.isNotEmpty()) {
-                    LineChart(
+                if (salesTrend.isNotEmpty()) {
+                    CustomLineChart(
                         modifier = Modifier.fillMaxSize(),
-                        lineChartData = lineChartData
+                        salesData = salesTrend
                     )
                 } else {
                     Column(
@@ -470,91 +466,130 @@ fun ActivityItem(activity: Activity) {
 }
 
 @Composable
-private fun createLineChartData(salesTrend: Map<ZonedDateTime, Double>): LineChartData {
+fun CustomLineChart(
+    modifier: Modifier = Modifier,
+    salesData: Map<ZonedDateTime, Double>
+) {
+    val sortedEntries = salesData.entries.sortedBy { it.key }
+    val maxValue = sortedEntries.maxOfOrNull { it.value } ?: 0.0
+    val minValue = sortedEntries.minOfOrNull { it.value } ?: 0.0
     val dateFormatter = DateTimeFormatter.ofPattern("MM/dd")
     
-    if (salesTrend.isEmpty()) {
-        return LineChartData(
-            linePlotData = LinePlotData(lines = emptyList()),
-            xAxisData = AxisData.Builder().build(),
-            yAxisData = AxisData.Builder().build()
+    Box(modifier = modifier) {
+        Canvas(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            if (sortedEntries.isNotEmpty()) {
+                drawLineChart(
+                    entries = sortedEntries,
+                    maxValue = maxValue,
+                    minValue = minValue,
+                    size = size
+                )
+            }
+        }
+        
+        // Draw labels overlay
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            // Y-axis labels
+            for (i in 5 downTo 0) {
+                val value = (maxValue * i / 5).toInt()
+                Text(
+                    text = if (value > 0) "S/$value" else "S/0",
+                    fontSize = 10.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+        
+        // X-axis labels
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = 32.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            sortedEntries.forEachIndexed { index, entry ->
+                if (index % max(1, sortedEntries.size / 4) == 0) {
+                    Text(
+                        text = entry.key.format(dateFormatter),
+                        fontSize = 10.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+private fun DrawScope.drawLineChart(
+    entries: List<Map.Entry<ZonedDateTime, Double>>,
+    maxValue: Double,
+    minValue: Double,
+    size: Size
+) {
+    val padding = 32.dp.toPx()
+    val chartWidth = size.width - (padding * 2)
+    val chartHeight = size.height - (padding * 2)
+    
+    val valueRange = maxValue - minValue
+    if (valueRange == 0.0 || entries.size < 2) return
+    
+    val path = Path()
+    val gradientPath = Path()
+    
+    entries.forEachIndexed { index, entry ->
+        val x = padding + (index.toFloat() / (entries.size - 1)) * chartWidth
+        val y = padding + chartHeight - ((entry.value - minValue) / valueRange * chartHeight).toFloat()
+        
+        if (index == 0) {
+            path.moveTo(x, y)
+            gradientPath.moveTo(x, size.height - padding)
+            gradientPath.lineTo(x, y)
+        } else {
+            path.lineTo(x, y)
+            gradientPath.lineTo(x, y)
+        }
+        
+        // Draw point
+        drawCircle(
+            color = androidx.compose.ui.graphics.Color(0xFF2196F3),
+            radius = 3.dp.toPx(),
+            center = Offset(x, y)
         )
     }
     
-    val sortedEntries = salesTrend.entries.sortedBy { it.key }
-    val points = sortedEntries.mapIndexed { index, entry ->
-        Point(index.toFloat(), entry.value.toFloat())
+    // Close gradient path
+    if (entries.isNotEmpty()) {
+        val lastX = padding + chartWidth
+        gradientPath.lineTo(lastX, size.height - padding)
+        gradientPath.close()
     }
     
-    val maxValue = sortedEntries.maxOfOrNull { it.value } ?: 0.0
-    val ySteps = 5
-    
-    val xAxisData = AxisData.Builder()
-        .axisStepSize(40.dp)
-        .backgroundColor(Color.Transparent)
-        .steps(sortedEntries.size - 1)
-        .labelData { index ->
-            if (index < sortedEntries.size) {
-                sortedEntries[index].key.format(dateFormatter)
-            } else ""
-        }
-        .labelAndAxisLinePadding(15.dp)
-        .axisLineColor(MaterialTheme.colorScheme.outline)
-        .axisLabelColor(MaterialTheme.colorScheme.onSurfaceVariant)
-        .build()
-    
-    val yAxisData = AxisData.Builder()
-        .steps(ySteps)
-        .backgroundColor(Color.Transparent)
-        .labelAndAxisLinePadding(20.dp)
-        .labelData { index ->
-            val value = (maxValue * index / ySteps).toInt()
-            if (value > 0) "S/$value" else "S/0"
-        }
-        .axisLineColor(MaterialTheme.colorScheme.outline)
-        .axisLabelColor(MaterialTheme.colorScheme.onSurfaceVariant)
-        .build()
-    
-    return LineChartData(
-        linePlotData = LinePlotData(
-            lines = listOf(
-                Line(
-                    dataPoints = points,
-                    LineStyle(
-                        color = Color(0xFF2196F3),
-                        lineType = LineType.SmoothCurve()
-                    ),
-                    IntersectionPoint(
-                        color = Color(0xFF2196F3),
-                        radius = 4.dp
-                    ),
-                    SelectionHighlightPoint(
-                        color = Color(0xFF1976D2),
-                        radius = 6.dp
-                    ),
-                    ShadowUnderLine(
-                        alpha = 0.3f,
-                        brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                            colors = listOf(
-                                Color(0xFF2196F3).copy(alpha = 0.4f),
-                                Color.Transparent
-                            )
-                        )
-                    ),
-                    SelectionHighlightPopUp(
-                        popUpLabel = { x, y ->
-                            val dateIndex = x.toInt()
-                            val date = if (dateIndex < sortedEntries.size) {
-                                sortedEntries[dateIndex].key.format(dateFormatter)
-                            } else ""
-                            "$date: S/${NumberFormat.getNumberInstance(Locale.US).format(y)}"
-                        }
-                    )
-                )
+    // Draw gradient fill
+    drawPath(
+        path = gradientPath,
+        brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+            colors = listOf(
+                androidx.compose.ui.graphics.Color(0xFF2196F3).copy(alpha = 0.3f),
+                androidx.compose.ui.graphics.Color.Transparent
             )
-        ),
-        xAxisData = xAxisData,
-        yAxisData = yAxisData,
-        backgroundColor = Color.Transparent
+        )
+    )
+    
+    // Draw line
+    drawPath(
+        path = path,
+        color = androidx.compose.ui.graphics.Color(0xFF2196F3),
+        style = Stroke(
+            width = 2.dp.toPx(),
+            cap = StrokeCap.Round
+        )
     )
 }
