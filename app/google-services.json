@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "326597194659",
+    "firebase_url": "https://inkscape-ac4c3-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "inkscape-ac4c3",
+    "storage_bucket": "inkscape-ac4c3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:326597194659:android:1bbd1ad01cdba6da10a016",
+        "android_client_info": {
+          "package_name": "com.joshua.inkscape"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1Bnskhq6agukFEhu82iIlV2ey0dDI8eg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+} 
