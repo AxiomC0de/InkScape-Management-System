@@ -4,11 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.joshua.inkscape.data.repository.ProductRepository
+import com.joshua.inkscape.data.repository.ActivityRepository
 import com.joshua.inkscape.data.model.Product
+import com.joshua.inkscape.data.model.Activity
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ProductViewModel(private val repository: ProductRepository) : ViewModel() {
 
@@ -18,6 +22,7 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
     private val _allProducts = MutableStateFlow<List<Product>>(emptyList())
     private val _pendingDeletionProduct = MutableStateFlow<Product?>(null)
     private var deletionJob: Job? = null
+    private val activityRepository = ActivityRepository()
 
     val products: StateFlow<List<Product>> =
         combine(_allProducts, _pendingDeletionProduct, searchQuery) { products, pendingDeletion, query ->
@@ -57,7 +62,20 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
         _pendingDeletionProduct.value = product
         deletionJob = viewModelScope.launch {
             delay(5000) // Snackbar duration
-            product.id?.let { repository.deleteProduct(it) }
+            product.id?.let { 
+                repository.deleteProduct(it)
+                
+                // Log activity
+                val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                val activity = Activity(
+                    details = "Deleted product: ${product.name} (Category: ${product.category})",
+                    timestamp = timestamp,
+                    type = "product_deleted",
+                    productName = product.name,
+                    user = "System"
+                )
+                activityRepository.addActivity(activity)
+            }
             _pendingDeletionProduct.value = null
         }
     }

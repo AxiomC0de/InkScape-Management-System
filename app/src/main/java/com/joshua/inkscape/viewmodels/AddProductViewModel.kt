@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.joshua.inkscape.data.model.Product
+import com.joshua.inkscape.data.model.Activity
+import com.joshua.inkscape.data.repository.ActivityRepository
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
@@ -14,6 +16,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import android.util.Log
+import java.text.SimpleDateFormat
+import java.util.*
 
 class AddProductViewModel : ViewModel() {
 
@@ -46,6 +50,7 @@ class AddProductViewModel : ViewModel() {
     private val database = Firebase.database
     private val productsRef = database.getReference("products")
     private val categoriesRef = database.getReference("categories")
+    private val activityRepository = ActivityRepository()
 
     init {
         fetchCategories()
@@ -94,6 +99,18 @@ class AddProductViewModel : ViewModel() {
                     imageUrl = "" // Image URL is not handled yet
                 )
                 newProductRef.setValue(product).await()
+
+                // Log activity
+                val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                val activity = Activity(
+                    details = "Added new product: $productName (Category: $category)",
+                    timestamp = timestamp,
+                    type = "product_added",
+                    productName = productName,
+                    user = "System"
+                )
+                activityRepository.addActivity(activity)
+
                 onSuccess()
             } catch (e: Exception) {
                 onError(e.message ?: "An unknown error occurred.")

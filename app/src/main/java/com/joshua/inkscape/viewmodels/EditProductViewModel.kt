@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.joshua.inkscape.data.model.Product
+import com.joshua.inkscape.data.model.Activity
+import com.joshua.inkscape.data.repository.ActivityRepository
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
@@ -16,12 +18,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.time.Instant
+import java.text.SimpleDateFormat
+import java.util.*
 
 class EditProductViewModel(private val productId: String) : ViewModel() {
 
     private val database = Firebase.database
     private val productsRef = database.getReference("products")
     private val categoriesRef = database.getReference("categories")
+    private val activityRepository = ActivityRepository()
 
     var productName by mutableStateOf("")
     var description by mutableStateOf("")
@@ -92,6 +97,19 @@ class EditProductViewModel(private val productId: String) : ViewModel() {
                     "updatedAt" to Instant.now().toString()
                 )
                 productsRef.child(productId).updateChildren(productUpdate).await()
+
+                // Log activity
+                val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                val activity = Activity(
+                    details = "Updated product: $productName (Category: $category)",
+                    timestamp = timestamp,
+                    type = "product_updated",
+                    productId = productId,
+                    productName = productName,
+                    user = "System"
+                )
+                activityRepository.addActivity(activity)
+
                 onSuccess()
             } catch (e: Exception) {
                 onError(e.message ?: "An unknown error occurred.")

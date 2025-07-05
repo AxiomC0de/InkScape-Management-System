@@ -5,14 +5,18 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.joshua.inkscape.data.repository.ProductRepository
+import com.joshua.inkscape.data.repository.ActivityRepository
 import com.joshua.inkscape.data.model.Product
 import com.joshua.inkscape.data.model.Sale
 import com.joshua.inkscape.data.model.SaleProduct
+import com.joshua.inkscape.data.model.Activity
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.*
 
 data class Fee(val name: String, val amount: Double)
 
@@ -53,6 +57,7 @@ class CreateSaleViewModel : ViewModel() {
 
     // Data from repositories
     private val productRepository = ProductRepository()
+    private val activityRepository = ActivityRepository()
     private val _allProducts = MutableStateFlow<List<Product>>(emptyList())
     val filteredProducts: StateFlow<List<Product>> = combine(_allProducts, _productSearchQuery) { products, query ->
         if (query.isBlank()) {
@@ -162,6 +167,16 @@ class CreateSaleViewModel : ViewModel() {
                         productRef.child("status").setValue(if (newQuantity > 0) "available" else "unavailable").await()
                     }
                 }
+
+                // Log activity
+                val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                val activity = Activity(
+                    details = "Created new sale: ${serviceName.value} for ${customerName.value.ifBlank { "Unknown Customer" }}",
+                    timestamp = timestamp,
+                    type = "sale_created",
+                    user = "System"
+                )
+                activityRepository.addActivity(activity)
 
                 onSuccess()
             } catch (e: Exception) {
