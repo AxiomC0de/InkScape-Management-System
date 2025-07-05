@@ -60,6 +60,87 @@ class DashboardViewModel(
         fetchTotalSales()
         fetchLowStockProducts()
         fetchRecentActivities()
+        // Create some test activities if none exist
+        createTestActivitiesIfNeeded()
+    }
+
+    private fun createTestActivitiesIfNeeded() {
+        viewModelScope.launch {
+            // Wait a bit for activities to load
+            kotlinx.coroutines.delay(2000)
+            if (_recentActivities.value.isEmpty()) {
+                createTestActivities()
+            }
+        }
+    }
+
+    private fun createTestActivities() {
+        val testActivities = listOf(
+            Activity(
+                details = "Created new sale: Hair Cut for John Doe",
+                timestamp = "2024-01-10 14:30:15",
+                type = "sale_created",
+                user = "System"
+            ),
+            Activity(
+                details = "Added new product: Premium Shampoo (Category: Hair Care)",
+                timestamp = "2024-01-10 13:45:22",
+                type = "product_added",
+                user = "System"
+            ),
+            Activity(
+                details = "Updated product: Hair Conditioner (Category: Hair Care)",
+                timestamp = "2024-01-10 12:15:30",
+                type = "product_updated",
+                user = "System"
+            ),
+            Activity(
+                details = "Created new sale: Manicure for Sarah Smith",
+                timestamp = "2024-01-10 11:20:45",
+                type = "sale_created",
+                user = "System"
+            ),
+            Activity(
+                details = "Deleted product: Old Hair Gel (Category: Styling)",
+                timestamp = "2024-01-10 10:05:12",
+                type = "product_deleted",
+                user = "System"
+            ),
+            Activity(
+                details = "Added new product: Nail Polish Set (Category: Nail Care)",
+                timestamp = "2024-01-10 09:30:18",
+                type = "product_added",
+                user = "System"
+            ),
+            Activity(
+                details = "Created new sale: Hair Color for Mike Johnson",
+                timestamp = "2024-01-09 16:45:33",
+                type = "sale_created",
+                user = "System"
+            ),
+            Activity(
+                details = "Updated product: Hair Dryer (Category: Tools)",
+                timestamp = "2024-01-09 15:20:55",
+                type = "product_updated",
+                user = "System"
+            ),
+            Activity(
+                details = "Added new product: Curling Iron (Category: Tools)",
+                timestamp = "2024-01-09 14:10:42",
+                type = "product_added",
+                user = "System"
+            ),
+            Activity(
+                details = "Created new sale: Pedicure for Emma Wilson",
+                timestamp = "2024-01-09 13:00:28",
+                type = "sale_created",
+                user = "System"
+            )
+        )
+        
+        testActivities.forEach { activity ->
+            activityRepository.addActivity(activity)
+        }
     }
 
     private fun fetchTotalRevenue() {
