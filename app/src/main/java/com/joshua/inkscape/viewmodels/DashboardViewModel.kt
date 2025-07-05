@@ -14,22 +14,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
-import com.joshua.inkscape.data.repository.ProductRepository
-import com.joshua.inkscape.data.repository.SalesRepository
-import com.joshua.inkscape.data.model.Activity
-import com.joshua.inkscape.data.repository.ActivityRepository
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import com.joshua.inkscape.data.model.Product
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 
 class DashboardViewModel(
     private val salesRepository: SalesRepository,
@@ -85,7 +74,7 @@ class DashboardViewModel(
     private fun fetchLowStockProducts() {
         viewModelScope.launch {
             productRepository.getProductsFlow().collect { products ->
-                _lowStockProducts.value = products.filter { it.stock < 5 }
+                _lowStockProducts.value = products.filter { it.quantity < 5 }
             }
         }
     }
