@@ -162,21 +162,21 @@ fun DashboardScreen(
                             details = "Added new product to inventory",
                             timestamp = "2024-01-15T10:30:00Z",
                             type = "product_add",
-                            userId = "user1"
+                            user = "user1"
                         ),
                         Activity(
                             id = "2",
                             details = "Completed sale #001",
                             timestamp = "2024-01-15T09:15:00Z",
                             type = "sale_complete",
-                            userId = "user1"
+                            user = "user1"
                         ),
                         Activity(
                             id = "3",
                             details = "Updated product pricing",
                             timestamp = "2024-01-15T08:45:00Z",
                             type = "product_update",
-                            userId = "user1"
+                            user = "user1"
                         )
                     )
                     items(sampleActivities) { activity ->
