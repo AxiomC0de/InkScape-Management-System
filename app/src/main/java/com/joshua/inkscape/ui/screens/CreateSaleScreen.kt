@@ -14,7 +14,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -256,7 +256,7 @@ fun CreateSaleScreen(
             item {
                 SectionCard(
                     title = "Payment Information",
-                    icon = Icons.Default.AttachMoney
+                    icon = Icons.Default.MonetizationOn
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         Row(
@@ -412,7 +412,7 @@ fun CreateSaleScreen(
             item {
                 SectionCard(
                     title = "Additional Fees",
-                    icon = Icons.Default.AttachMoney,
+                    icon = Icons.Default.MonetizationOn,
                     actionButton = {
                         OutlinedButton(
                             onClick = { showAddFeeDialog = true },
@@ -862,7 +862,7 @@ fun FeeItem(fee: Fee, onRemove: () -> Unit) {
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Icon(
-                        Icons.Default.AttachMoney,
+                        Icons.Default.MonetizationOn,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSecondary,
                         modifier = Modifier

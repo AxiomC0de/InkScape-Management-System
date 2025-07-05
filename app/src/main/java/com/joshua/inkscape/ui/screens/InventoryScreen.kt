@@ -10,10 +10,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Inventory
+import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Category
-import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -172,7 +172,7 @@ fun InventoryScreen(
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Icon(
-                                Icons.Default.Inventory,
+                                Icons.Default.Inventory2,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier
@@ -235,7 +235,7 @@ fun InventoryScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Icon(
-                                Icons.Default.Inventory,
+                                Icons.Default.Inventory2,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(48.dp)
@@ -387,7 +387,7 @@ fun ProductItem(product: Product, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 ProductDetailChip(
-                    icon = Icons.Default.AttachMoney,
+                    icon = Icons.Default.MonetizationOn,
                     label = "Price",
                     value = "₱${product.price}",
                     modifier = Modifier.weight(1f)
