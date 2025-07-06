@@ -70,7 +70,7 @@ fun InventoryScreen(
     val totalProducts = filteredProducts.size
     val lowStockProducts = filteredProducts.count { it.quantity < 5 }
     val outOfStockProducts = filteredProducts.count { it.quantity == 0 }
-    val totalValue = filteredProducts.sumOf { it.price * it.quantity }
+    val totalValue = filteredProducts.sumOf { it.price }
 
     if (showFilterDialog) {
         FilterDialog(
@@ -484,15 +484,15 @@ fun ModernProductCard(product: Product, onClick: () -> Unit) {
                     )
                 }
                 
-                // Total Value Column
+                // Unit Price Column
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = "Total Value",
+                        text = "Unit Price",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "₱${NumberFormat.getNumberInstance(Locale("en", "PH")).format(product.price * product.quantity)}",
+                        text = "₱${NumberFormat.getNumberInstance(Locale("en", "PH")).format(product.price)}",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface

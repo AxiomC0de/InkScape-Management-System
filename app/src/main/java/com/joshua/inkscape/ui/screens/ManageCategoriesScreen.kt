@@ -13,13 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.joshua.inkscape.viewmodels.CategoryViewModel
+import com.joshua.inkscape.viewmodels.CategoryViewModelFactory
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageCategoriesScreen(
     onNavigateBack: () -> Unit,
-    viewModel: CategoryViewModel = viewModel()
+    viewModel: CategoryViewModel = viewModel(factory = CategoryViewModelFactory())
 ) {
     val categories by viewModel.categories.collectAsState()
     val scope = rememberCoroutineScope()
