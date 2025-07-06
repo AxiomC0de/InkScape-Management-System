@@ -11,7 +11,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.outlined.Photo
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -304,7 +304,7 @@ fun AddProductScreen(
                 ModernSectionCard(
                     title = "Product Image",
                     description = "Add a visual representation",
-                    icon = Icons.Outlined.Photo
+                    icon = Icons.Filled.Add
                 ) {
                     Column {
                         Surface(
@@ -324,7 +324,7 @@ fun AddProductScreen(
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 Icon(
-                                    Icons.Outlined.Photo,
+                                    Icons.Filled.Add,
                                     contentDescription = null,
                                     modifier = Modifier.size(32.dp),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -346,7 +346,7 @@ fun AddProductScreen(
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Icon(
-                                Icons.Outlined.Photo,
+                                Icons.Filled.Add,
                                 contentDescription = null,
                                 modifier = Modifier.size(18.dp)
                             )
