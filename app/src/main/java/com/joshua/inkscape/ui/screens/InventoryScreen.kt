@@ -16,8 +16,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.outlined.Category
-import androidx.compose.material.icons.outlined.FilterList
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -186,7 +185,7 @@ fun InventoryScreen(
                                 containerColor = MaterialTheme.colorScheme.primaryContainer
                             )
                         ) {
-                            Icon(Icons.Outlined.FilterList, contentDescription = "Filter")
+                            Icon(Icons.Filled.Search, contentDescription = "Filter")
                         }
                         
                         FilledIconButton(
@@ -195,7 +194,7 @@ fun InventoryScreen(
                                 containerColor = MaterialTheme.colorScheme.secondaryContainer
                             )
                         ) {
-                            Icon(Icons.Outlined.Category, contentDescription = "Categories")
+                            Icon(Icons.Filled.ShoppingCart, contentDescription = "Categories")
                         }
                     }
                     
