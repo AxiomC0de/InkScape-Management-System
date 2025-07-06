@@ -18,7 +18,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.LocalOffer
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -143,7 +143,7 @@ fun CreateSaleScreen(
                 ModernSectionCard(
                     title = "Service Information",
                     description = "Basic details about your service",
-                    icon = Icons.Filled.LocalOffer,
+                    icon = Icons.Filled.Edit,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 ) {
                     Column(
@@ -235,7 +235,7 @@ fun CreateSaleScreen(
                 ModernSectionCard(
                     title = "Pricing & Payment",
                     description = "Set service cost and payment status",
-                    icon = Icons.Filled.LocalOffer,
+                    icon = Icons.Filled.Edit,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 ) {
                     Column(
@@ -561,7 +561,7 @@ fun ProgressIndicatorSection() {
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Icon(
-                Icons.Filled.LocalOffer,
+                Icons.Filled.Edit,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
