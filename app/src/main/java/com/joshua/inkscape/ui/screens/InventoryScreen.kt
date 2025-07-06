@@ -16,7 +16,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun InventoryScreen(
     navController: NavController,
@@ -111,15 +111,8 @@ fun InventoryScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            AnimatedContent(
-                targetState = isSelectionMode,
-                transitionSpec = {
-                    slideInVertically { -it } + fadeIn() with slideOutVertically { -it } + fadeOut()
-                },
-                label = "topbar_animation"
-            ) { selectionMode ->
-                if (selectionMode) {
-                    // Selection Mode Top Bar
+                         if (isSelectionMode) {
+                // Selection Mode Top Bar
                     TopAppBar(
                         title = { 
                             Text("${selectedProducts.size} selected")
@@ -142,7 +135,7 @@ fun InventoryScreen(
                                     }
                                 }
                             ) {
-                                Icon(Icons.Filled.CheckBox, contentDescription = "Select All")
+                                Icon(Icons.Filled.Done, contentDescription = "Select All")
                             }
                             IconButton(
                                 onClick = {
@@ -178,28 +171,27 @@ fun InventoryScreen(
                             containerColor = MaterialTheme.colorScheme.primaryContainer
                         )
                     )
-                } else {
-                    // Normal Mode Top Bar
-                    TopAppBar(
-                        title = { 
-                            Column {
-                                Text(
-                                    "Inventory Management",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    "Manage your product inventory",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
+            } else {
+                // Normal Mode Top Bar
+                TopAppBar(
+                    title = { 
+                        Column {
+                            Text(
+                                "Inventory Management",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                "Manage your product inventory",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
-                }
+                )
             }
         },
         floatingActionButton = {
