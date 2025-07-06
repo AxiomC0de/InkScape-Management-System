@@ -85,7 +85,7 @@ class DashboardViewModel(
     private fun fetchLowStockProducts() {
         viewModelScope.launch {
             productRepository.getProductsFlow().collect { products ->
-                _lowStockProducts.value = products.filter { it.stock < 5 }
+                _lowStockProducts.value = products.filter { it.quantity <= it.lowStockThreshold }
             }
         }
     }
