@@ -217,7 +217,7 @@ fun EnhancedStatsSection(
             EnhancedStatCard(
                 title = "Unpaid Amount",
                 value = "₱${NumberFormat.getNumberInstance(Locale("en", "PH")).format(unpaidAmount)}",
-                icon = Icons.Filled.Error,
+                icon = Icons.Filled.Warning,
                 color = Color(0xFFF44336),
                 modifier = Modifier.weight(1f)
             )
@@ -302,7 +302,7 @@ fun SalesTrendSection(salesTrend: Map<ZonedDateTime, Double>) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Icon(
-                    Icons.Filled.ArrowUpward,
+                    Icons.Filled.KeyboardArrowUp,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
@@ -616,7 +616,7 @@ fun EnhancedRecentActivity(recentActivities: List<Activity>) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Icon(
-                    Icons.Filled.AccessTime,
+                    Icons.Filled.Schedule,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
@@ -643,7 +643,7 @@ fun EnhancedRecentActivity(recentActivities: List<Activity>) {
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Icon(
-                            Icons.Filled.AccessTime,
+                            Icons.Filled.Schedule,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(32.dp)
