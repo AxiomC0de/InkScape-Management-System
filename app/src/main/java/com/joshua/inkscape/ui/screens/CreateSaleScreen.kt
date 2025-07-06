@@ -2,6 +2,7 @@ package com.joshua.inkscape.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,7 +18,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -142,7 +143,7 @@ fun CreateSaleScreen(
                 ModernSectionCard(
                     title = "Service Information",
                     description = "Basic details about your service",
-                    icon = Icons.Filled.Receipt,
+                    icon = Icons.Filled.LocalOffer,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 ) {
                     Column(
@@ -234,7 +235,7 @@ fun CreateSaleScreen(
                 ModernSectionCard(
                     title = "Pricing & Payment",
                     description = "Set service cost and payment status",
-                    icon = Icons.Filled.Receipt,
+                    icon = Icons.Filled.LocalOffer,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 ) {
                     Column(
@@ -560,7 +561,7 @@ fun ProgressIndicatorSection() {
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Icon(
-                Icons.Filled.Receipt,
+                Icons.Filled.LocalOffer,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
