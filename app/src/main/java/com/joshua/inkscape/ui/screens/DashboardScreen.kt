@@ -218,43 +218,9 @@ fun DashboardScreen(
             }
         }
 
-        // Category Sales Ranking Section
+        // Category Sales Ranking Section with Scrollable List
         item {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = "Category Sales Ranking",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Generate sample category data
-                    val categoryRankings = generateCategoryRankings()
-                    
-                    categoryRankings.forEachIndexed { index, category ->
-                        CategoryRankingItem(
-                            rank = index + 1,
-                            categoryName = category.name,
-                            salesCount = category.sales,
-                            percentage = category.percentage,
-                            isTopCategory = index == 0
-                        )
-                        
-                        if (index < categoryRankings.size - 1) {
-                            Spacer(modifier = Modifier.height(12.dp))
-                        }
-                    }
-                }
-            }
+            CategorySalesRankingSection(categories = generateCategoryRankings())
         }
 
         // Recent Activity Section with Scrollable List
@@ -340,7 +306,17 @@ fun generateCategoryRankings(): List<CategoryRanking> {
         "Home & Garden" to 256,
         "Sports" to 189,
         "Books" to 134,
-        "Beauty" to 98
+        "Beauty" to 98,
+        "Automotive" to 87,
+        "Toys & Games" to 76,
+        "Health & Wellness" to 65,
+        "Office Supplies" to 54,
+        "Pet Supplies" to 43,
+        "Jewelry" to 38,
+        "Arts & Crafts" to 32,
+        "Music & Instruments" to 28,
+        "Outdoor & Recreation" to 24,
+        "Software" to 19
     )
     
     val totalSales = categories.sumOf { it.second }
@@ -362,85 +338,253 @@ fun CategoryRankingItem(
     percentage: Float,
     isTopCategory: Boolean = false
 ) {
-    Row(
+    Card(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isTopCategory) 
+                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+            else 
+                MaterialTheme.colorScheme.surfaceVariant
+        )
     ) {
-        // Rank Badge
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Rank Badge with Medal Colors
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(
+                        when (rank) {
+                            1 -> Color(0xFFFFD700) // Gold
+                            2 -> Color(0xFFC0C0C0) // Silver
+                            3 -> Color(0xFFCD7F32) // Bronze
+                            else -> MaterialTheme.colorScheme.primaryContainer
+                        }
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = rank.toString(),
+                    color = if (rank <= 3) Color.Black else MaterialTheme.colorScheme.onPrimaryContainer,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+            }
+            
+            Spacer(modifier = Modifier.width(12.dp))
+            
+            // Category Info
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = categoryName,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 15.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "$salesCount sales",
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            
+            Spacer(modifier = Modifier.width(8.dp))
+            
+            // Percentage and Progress Bar
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = "${percentage.toInt()}%",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                
+                Spacer(modifier = Modifier.height(6.dp))
+                
+                // Enhanced Progress Bar
+                Box(
+                    modifier = Modifier
+                        .width(70.dp)
+                        .height(6.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth(percentage / 100f)
+                            .clip(RoundedCornerShape(3.dp))
+                            .background(
+                                when (rank) {
+                                    1 -> Color(0xFFFFD700) // Gold
+                                    2 -> Color(0xFFC0C0C0) // Silver
+                                    3 -> Color(0xFFCD7F32) // Bronze
+                                    else -> MaterialTheme.colorScheme.primary
+                                }
+                            )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CategorySalesRankingSection(categories: List<CategoryRanking>) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            // Header with category count
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Category Sales Ranking",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                
+                // Category count badge
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "${categories.size}",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Top 3 categories summary
+            if (categories.isNotEmpty()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    categories.take(3).forEachIndexed { index, category ->
+                        TopCategorySummary(
+                            rank = index + 1,
+                            categoryName = category.name,
+                            percentage = category.percentage
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            
+            // Scrollable categories list with fixed height
+            if (categories.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(280.dp), // Fixed height to contain scrolling
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(categories) { category ->
+                        CategoryRankingItem(
+                            rank = categories.indexOf(category) + 1,
+                            categoryName = category.name,
+                            salesCount = category.sales,
+                            percentage = category.percentage,
+                            isTopCategory = categories.indexOf(category) == 0
+                        )
+                    }
+                }
+            } else {
+                // Empty state
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No category data available",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TopCategorySummary(
+    rank: Int,
+    categoryName: String,
+    percentage: Float
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Rank badge
         Box(
             modifier = Modifier
-                .size(32.dp)
-                .clip(RoundedCornerShape(16.dp))
+                .size(24.dp)
+                .clip(RoundedCornerShape(12.dp))
                 .background(
-                    if (isTopCategory) 
-                        Color(0xFFFFD700) // Gold for #1
-                    else 
-                        MaterialTheme.colorScheme.primaryContainer
+                    when (rank) {
+                        1 -> Color(0xFFFFD700) // Gold
+                        2 -> Color(0xFFC0C0C0) // Silver
+                        3 -> Color(0xFFCD7F32) // Bronze
+                        else -> MaterialTheme.colorScheme.primaryContainer
+                    }
                 ),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = rank.toString(),
-                color = if (isTopCategory) Color.Black else MaterialTheme.colorScheme.onPrimaryContainer,
+                fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
-                fontSize = 14.sp
+                color = if (rank <= 3) Color.Black else MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
         
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         
-        // Category Info
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = categoryName,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = "$salesCount sales",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
+        Text(
+            text = categoryName,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1
+        )
         
-        // Percentage and Progress Bar
-        Column(
-            horizontalAlignment = Alignment.End
-        ) {
-            Text(
-                text = "${percentage.toInt()}%",
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.primary
-            )
-            
-            Spacer(modifier = Modifier.height(4.dp))
-            
-            // Progress Bar
-            Box(
-                modifier = Modifier
-                    .width(80.dp)
-                    .height(8.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(percentage / 100f)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(
-                            if (isTopCategory) 
-                                Color(0xFFFFD700) 
-                            else 
-                                MaterialTheme.colorScheme.primary
-                        )
-                )
-            }
-        }
+        Text(
+            text = "${percentage.toInt()}%",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
     }
 }
 
