@@ -16,7 +16,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.SelectAll
+import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun InventoryScreen(
     navController: NavController,
@@ -142,7 +142,7 @@ fun InventoryScreen(
                                     }
                                 }
                             ) {
-                                Icon(Icons.Filled.SelectAll, contentDescription = "Select All")
+                                Icon(Icons.Filled.CheckBox, contentDescription = "Select All")
                             }
                             IconButton(
                                 onClick = {
@@ -267,8 +267,7 @@ fun InventoryScreen(
                         AnimatedVisibility(
                             visible = true,
                             enter = fadeIn() + slideInVertically(),
-                            exit = fadeOut() + slideOutVertically() + scaleOut(),
-                            modifier = Modifier.animateItemPlacement()
+                            exit = fadeOut() + slideOutVertically() + scaleOut()
                         ) {
                             EnhancedProductItem(
                                 product = product,

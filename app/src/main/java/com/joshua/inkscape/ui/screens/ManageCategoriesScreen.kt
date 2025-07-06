@@ -12,7 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,7 +27,7 @@ import com.joshua.inkscape.viewmodels.CategoryViewModel
 import com.joshua.inkscape.viewmodels.CategoryViewModelFactory
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ManageCategoriesScreen(
     onNavigateBack: () -> Unit,
@@ -114,12 +114,11 @@ fun ManageCategoriesScreen(
                         items = categories,
                         key = { it }
                     ) { category ->
-                        AnimatedVisibility(
-                            visible = true,
-                            enter = fadeIn() + slideInVertically() + scaleIn(initialScale = 0.8f),
-                            exit = fadeOut() + slideOutVertically() + scaleOut(targetScale = 0.8f),
-                            modifier = Modifier.animateItemPlacement()
-                        ) {
+                                                 AnimatedVisibility(
+                             visible = true,
+                             enter = fadeIn() + slideInVertically() + scaleIn(initialScale = 0.8f),
+                             exit = fadeOut() + slideOutVertically() + scaleOut(targetScale = 0.8f)
+                         ) {
                             ModernCategoryItem(
                                 categoryName = category,
                                 onDelete = {
@@ -173,7 +172,7 @@ fun HeaderSection(totalCategories: Int) {
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Icon(
-                    Icons.Filled.Category,
+                    Icons.Filled.List,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
@@ -280,14 +279,14 @@ fun ModernCategoryItem(
                 ),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Icon(
-                    Icons.Filled.Category,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(20.dp)
-                )
+                                 Icon(
+                     Icons.Filled.List,
+                     contentDescription = null,
+                     tint = MaterialTheme.colorScheme.secondary,
+                     modifier = Modifier
+                         .padding(8.dp)
+                         .size(20.dp)
+                 )
             }
             
             // Category Name
@@ -339,12 +338,12 @@ fun EmptyStateSection() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Icon(
-                Icons.Filled.Category,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(64.dp)
-            )
+                         Icon(
+                 Icons.Filled.List,
+                 contentDescription = null,
+                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                 modifier = Modifier.size(64.dp)
+             )
             Text(
                 text = "No Categories Yet",
                 style = MaterialTheme.typography.headlineSmall,
