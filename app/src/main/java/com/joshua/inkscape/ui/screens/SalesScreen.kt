@@ -137,7 +137,7 @@ fun SalesScreen(
     }
 
     if (showFilterDialog) {
-        FilterDialog(
+        SalesFilterDialog(
             paymentMethods = paymentMethods,
             selectedFilter = selectedFilter,
             onFilterSelected = { selectedFilter = it },
@@ -567,7 +567,7 @@ fun PaymentStatusBadge(paymentStatus: String) {
 }
 
 @Composable
-fun FilterDialog(
+fun SalesFilterDialog(
     paymentMethods: List<String>,
     selectedFilter: String,
     onFilterSelected: (String) -> Unit,
