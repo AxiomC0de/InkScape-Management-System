@@ -136,7 +136,7 @@ fun ModernHeader() {
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Icon(
-                        Icons.Filled.Dashboard,
+                        Icons.Filled.Home,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
@@ -188,7 +188,7 @@ fun EnhancedStatsSection(
             EnhancedStatCard(
                 title = "Total Revenue",
                 value = "₱${NumberFormat.getNumberInstance(Locale("en", "PH")).format(totalRevenue)}",
-                icon = Icons.Filled.AttachMoney,
+                icon = Icons.Filled.Star,
                 color = Color(0xFF4CAF50),
                 modifier = Modifier.weight(1f)
             )
@@ -217,7 +217,7 @@ fun EnhancedStatsSection(
             EnhancedStatCard(
                 title = "Unpaid Amount",
                 value = "₱${NumberFormat.getNumberInstance(Locale("en", "PH")).format(unpaidAmount)}",
-                icon = Icons.Filled.Payment,
+                icon = Icons.Filled.Error,
                 color = Color(0xFFF44336),
                 modifier = Modifier.weight(1f)
             )
@@ -302,7 +302,7 @@ fun SalesTrendSection(salesTrend: Map<ZonedDateTime, Double>) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Icon(
-                    Icons.Filled.TrendingUp,
+                    Icons.Filled.ArrowUpward,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
@@ -380,7 +380,7 @@ fun EnhancedCategoryPerformance(categorySales: Map<String, Double>) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Icon(
-                    Icons.Filled.BarChart,
+                    Icons.Filled.List,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
@@ -407,7 +407,7 @@ fun EnhancedCategoryPerformance(categorySales: Map<String, Double>) {
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Icon(
-                            Icons.Filled.BarChart,
+                            Icons.Filled.List,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(32.dp)
@@ -616,7 +616,7 @@ fun EnhancedRecentActivity(recentActivities: List<Activity>) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Icon(
-                    Icons.Filled.History,
+                    Icons.Filled.AccessTime,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
@@ -643,7 +643,7 @@ fun EnhancedRecentActivity(recentActivities: List<Activity>) {
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Icon(
-                            Icons.Filled.History,
+                            Icons.Filled.AccessTime,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(32.dp)
@@ -727,9 +727,9 @@ fun EnhancedActivityItem(activity: Activity) {
 fun getActivityIcon(activityDetails: String): ImageVector {
     return when {
         activityDetails.contains("sale", ignoreCase = true) -> Icons.Filled.ShoppingCart
-        activityDetails.contains("product", ignoreCase = true) -> Icons.Filled.Inventory
-        activityDetails.contains("payment", ignoreCase = true) -> Icons.Filled.Payment
-        activityDetails.contains("category", ignoreCase = true) -> Icons.Filled.Category
+        activityDetails.contains("product", ignoreCase = true) -> Icons.Filled.Add
+        activityDetails.contains("payment", ignoreCase = true) -> Icons.Filled.Star
+        activityDetails.contains("category", ignoreCase = true) -> Icons.Filled.List
         else -> Icons.Filled.Info
     }
 }
