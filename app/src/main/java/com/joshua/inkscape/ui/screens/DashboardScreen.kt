@@ -13,8 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+// Removed LazyColumn imports to fix nested scrollable components issue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Star
@@ -794,10 +793,18 @@ fun RecentActivitySection(activities: List<Activity>) {
             )
         }
         
-        LazyColumn {
-            items(activities) { activity ->
-                ActivityItem(activity)
-            }
+        // Use regular Column instead of LazyColumn to avoid nested scrollable components
+        activities.take(5).forEach { activity ->
+            ActivityItem(activity)
+        }
+        
+        if (activities.size > 5) {
+            Text(
+                text = "... and ${activities.size - 5} more activities",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(16.dp)
+            )
         }
     }
 }
