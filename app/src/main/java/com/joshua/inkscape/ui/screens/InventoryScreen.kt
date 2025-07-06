@@ -483,7 +483,7 @@ fun SearchAndFilterSection(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun EnhancedProductItem(
     product: Product,
@@ -494,49 +494,8 @@ fun EnhancedProductItem(
     onClick: () -> Unit,
     onSwipeToDelete: () -> Unit
 ) {
-    val dismissState = rememberSwipeToDismissBoxState(
-        confirmValueChange = {
-            if (it == SwipeToDismissBoxValue.EndToStart && !isSelectionMode) {
-                onSwipeToDelete()
-                return@rememberSwipeToDismissBoxState true
-            }
-            false
-        }
-    )
-
-    SwipeToDismissBox(
-        state = dismissState,
-        enableDismissFromEndToStart = !isSelectionMode,
-        enableDismissFromStartToEnd = false,
-        backgroundContent = {
-            val color by animateColorAsState(
-                targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
-                    Color.Red.copy(alpha = 0.8f)
-                } else {
-                    Color.Transparent
-                }, label = ""
-            )
-            val scale by animateFloatAsState(
-                if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) 1.2f else 0.8f,
-                label = ""
-            )
-
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(color, shape = RoundedCornerShape(12.dp))
-                    .padding(horizontal = 20.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                Icon(
-                    Icons.Default.Delete,
-                    contentDescription = "Delete Icon",
-                    modifier = Modifier.scale(scale),
-                    tint = Color.White
-                )
-            }
-        }
-    ) {
+    // Simplified card without swipe-to-dismiss to avoid experimental APIs
+    // Swipe functionality is replaced with long-press multi-select
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -662,7 +621,6 @@ fun EnhancedProductItem(
                 }
             }
         }
-    }
 }
 
 @Composable
