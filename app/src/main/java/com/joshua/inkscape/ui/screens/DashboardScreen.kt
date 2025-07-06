@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -58,6 +59,12 @@ enum class TimePeriod(val label: String) {
     MONTH("Month"),
     YEAR("Year")
 }
+
+data class CategoryRanking(
+    val name: String,
+    val sales: Int,
+    val percentage: Float
+)
 
 @Composable
 fun DashboardScreen(
@@ -204,6 +211,45 @@ fun DashboardScreen(
                         .height(300.dp),
                     lineChartData = lineChartData
                 )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Category Sales Ranking Section
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = "Category Sales Ranking",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Generate sample category data
+                val categoryRankings = generateCategoryRankings()
+                
+                categoryRankings.forEachIndexed { index, category ->
+                    CategoryRankingItem(
+                        rank = index + 1,
+                        categoryName = category.name,
+                        salesCount = category.sales,
+                        percentage = category.percentage,
+                        isTopCategory = index == 0
+                    )
+                    
+                    if (index < categoryRankings.size - 1) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                }
             }
         }
 
@@ -796,6 +842,118 @@ fun generateChartData(period: TimePeriod, totalSales: Int, totalRevenue: Double)
                 Point(
                     x = month.toFloat(),
                     y = (totalSales * (0.6f + Math.random().toFloat() * 0.8f))
+                )
+            }
+        }
+    }
+}
+
+// Generate sample category ranking data
+fun generateCategoryRankings(): List<CategoryRanking> {
+    val categories = listOf(
+        "Electronics" to 342,
+        "Clothing" to 298,
+        "Home & Garden" to 256,
+        "Sports" to 189,
+        "Books" to 134,
+        "Beauty" to 98
+    )
+    
+    val totalSales = categories.sumOf { it.second }
+    
+    return categories.map { (name, sales) ->
+        CategoryRanking(
+            name = name,
+            sales = sales,
+            percentage = (sales.toFloat() / totalSales) * 100f
+        )
+    }
+}
+
+@Composable
+fun CategoryRankingItem(
+    rank: Int,
+    categoryName: String,
+    salesCount: Int,
+    percentage: Float,
+    isTopCategory: Boolean = false
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Rank Badge
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(
+                    if (isTopCategory) 
+                        Color(0xFFFFD700) // Gold for #1
+                    else 
+                        MaterialTheme.colorScheme.primaryContainer
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = rank.toString(),
+                color = if (isTopCategory) Color.Black else MaterialTheme.colorScheme.onPrimaryContainer,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp
+            )
+        }
+        
+        Spacer(modifier = Modifier.width(16.dp))
+        
+        // Category Info
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = categoryName,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "$salesCount sales",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        
+        // Percentage and Progress Bar
+        Column(
+            horizontalAlignment = Alignment.End
+        ) {
+            Text(
+                text = "${percentage.toInt()}%",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.primary
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            // Progress Bar
+            Box(
+                modifier = Modifier
+                    .width(80.dp)
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(percentage / 100f)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(
+                            if (isTopCategory) 
+                                Color(0xFFFFD700) 
+                            else 
+                                MaterialTheme.colorScheme.primary
+                        )
                 )
             }
         }
