@@ -3,6 +3,7 @@ package com.joshua.inkscape.ui.screens
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,13 +12,11 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -26,6 +25,7 @@ import com.joshua.inkscape.data.model.Product
 import com.joshua.inkscape.viewmodels.ProductViewModel
 import com.joshua.inkscape.viewmodels.ProductViewModelFactory
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,59 +84,18 @@ fun InventoryScreen(
             } else {
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(products, key = { it.id ?: "" }) { product ->
-                        val dismissState = rememberSwipeToDismissBoxState(
-                            confirmValueChange = {
-                                if (it == SwipeToDismissBoxValue.EndToStart) {
-                                    // Show confirmation dialog instead of immediately deleting
-                                    productToDelete = product
-                                    showDeleteDialog = true
-                                    return@rememberSwipeToDismissBoxState true
+                        SwipeableProductItem(
+                            product = product,
+                            onDelete = {
+                                productToDelete = product
+                                showDeleteDialog = true
+                            },
+                            onClick = {
+                                if (product.id != null) {
+                                    navController.navigate(Screen.EditProduct.createRoute(product.id))
                                 }
-                                false
                             }
                         )
-
-                        SwipeToDismissBox(
-                            state = dismissState,
-                            enableDismissFromEndToStart = true,
-                            enableDismissFromStartToEnd = false,
-                            backgroundContent = {
-                                val color by animateColorAsState(
-                                    targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
-                                        Color.Red.copy(alpha = 0.8f)
-                                    } else {
-                                        Color.Transparent
-                                    }, label = ""
-                                )
-                                val scale by animateFloatAsState(
-                                    if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) 1.2f else 0.8f,
-                                    label = ""
-                                )
-
-                                Box(
-                                    Modifier
-                                        .fillMaxSize()
-                                        .background(color)
-                                        .padding(horizontal = 20.dp),
-                                    contentAlignment = Alignment.CenterEnd
-                                ) {
-                                    Icon(
-                                        Icons.Default.Delete,
-                                        contentDescription = "Delete Icon",
-                                        modifier = Modifier.scale(scale)
-                                    )
-                                }
-                            }
-                        ) {
-                            ProductItem(
-                                product = product,
-                                onClick = {
-                                    if (product.id != null) {
-                                        navController.navigate(Screen.EditProduct.createRoute(product.id))
-                                    }
-                                }
-                            )
-                        }
                     }
                 }
             }
@@ -187,6 +146,93 @@ fun InventoryScreen(
                     }
                 }
             )
+        }
+    }
+}
+
+@Composable
+fun SwipeableProductItem(
+    product: Product,
+    onDelete: () -> Unit,
+    onClick: () -> Unit
+) {
+    var offsetX by remember { mutableStateOf(0f) }
+    var isSwiped by remember { mutableStateOf(false) }
+    
+    val animatedOffsetX by animateFloatAsState(
+        targetValue = offsetX,
+        label = "offsetX"
+    )
+    
+    val deleteButtonScale by animateFloatAsState(
+        targetValue = if (isSwiped) 1f else 0.8f,
+        label = "deleteButtonScale"
+    )
+    
+    val deleteButtonColor by animateColorAsState(
+        targetValue = if (isSwiped) Color.Red.copy(alpha = 0.9f) else Color.Red.copy(alpha = 0.7f),
+        label = "deleteButtonColor"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        // Delete button background
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .fillMaxHeight()
+                .width(80.dp)
+                .background(deleteButtonColor)
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Default.Delete,
+                contentDescription = "Delete",
+                modifier = Modifier.scale(deleteButtonScale),
+                tint = Color.White
+            )
+        }
+        
+        // Product card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset(x = animatedOffsetX.dp)
+                .pointerInput(Unit) {
+                    detectDragGestures(
+                        onDragEnd = {
+                            if (abs(offsetX) > 100f) {
+                                isSwiped = true
+                                onDelete()
+                            } else {
+                                offsetX = 0f
+                                isSwiped = false
+                            }
+                        }
+                    ) { _, dragAmount ->
+                        val newOffset = offsetX + dragAmount.x
+                        offsetX = newOffset.coerceAtMost(0f).coerceAtLeast(-200f)
+                        isSwiped = abs(offsetX) > 50f
+                    }
+                },
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            onClick = onClick
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Name: ${product.name}", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = "Category: ${product.category}")
+                Text(text = "Price: ₱${product.price}")
+                Text(text = "Quantity: ${product.quantity}")
+                Text(
+                    text = "Status: ${product.status.replaceFirstChar { it.uppercase() }}",
+                    color = if (product.status.equals("available", true)) Color(0xFF388E3C) else Color.Red
+                )
+            }
         }
     }
 }
