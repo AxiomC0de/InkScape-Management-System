@@ -11,6 +11,9 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -34,6 +37,10 @@ fun InventoryScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    
+    // State for delete confirmation dialog
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var productToDelete by remember { mutableStateOf<Product?>(null) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -80,16 +87,9 @@ fun InventoryScreen(
                         val dismissState = rememberSwipeToDismissBoxState(
                             confirmValueChange = {
                                 if (it == SwipeToDismissBoxValue.EndToStart) {
-                                    viewModel.deleteProductWithUndo(product)
-                                    scope.launch {
-                                        val result = snackbarHostState.showSnackbar(
-                                            message = "${product.name} deleted",
-                                            actionLabel = "Undo"
-                                        )
-                                        if (result == SnackbarResult.ActionPerformed) {
-                                            viewModel.undoDelete()
-                                        }
-                                    }
+                                    // Show confirmation dialog instead of immediately deleting
+                                    productToDelete = product
+                                    showDeleteDialog = true
                                     return@rememberSwipeToDismissBoxState true
                                 }
                                 false
@@ -140,6 +140,53 @@ fun InventoryScreen(
                     }
                 }
             }
+        }
+        
+        // Delete confirmation dialog
+        if (showDeleteDialog && productToDelete != null) {
+            AlertDialog(
+                onDismissRequest = {
+                    showDeleteDialog = false
+                    productToDelete = null
+                },
+                title = { Text("Delete Product") },
+                text = { 
+                    Text("Are you sure you want to delete '${productToDelete?.name}'? This action cannot be undone.")
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            productToDelete?.let { product ->
+                                viewModel.deleteProductWithUndo(product)
+                                scope.launch {
+                                    val result = snackbarHostState.showSnackbar(
+                                        message = "${product.name} deleted",
+                                        actionLabel = "Undo"
+                                    )
+                                    if (result == SnackbarResult.ActionPerformed) {
+                                        viewModel.undoDelete()
+                                    }
+                                }
+                            }
+                            showDeleteDialog = false
+                            productToDelete = null
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                    ) {
+                        Text("Delete")
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(
+                        onClick = {
+                            showDeleteDialog = false
+                            productToDelete = null
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
     }
 }
