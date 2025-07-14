@@ -16,6 +16,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.joshua.inkscape.navigation.NavigationManager
 import com.joshua.inkscape.viewmodels.AddProductViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,11 +26,21 @@ fun AddProductScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    var showSuccessMessage by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
         navigationManager.setHasUnsavedChangesCallback { viewModel.hasUnsavedChanges }
         onDispose {
             navigationManager.clearCallback()
+        }
+    }
+
+    // Show success message and navigate back after a delay
+    LaunchedEffect(showSuccessMessage) {
+        if (showSuccessMessage) {
+            snackbarHostState.showSnackbar("Product has been successfully added!")
+            delay(1500) // Wait 1.5 seconds for user to see the message
+            navigationManager.handleBackPress()
         }
     }
 
@@ -180,7 +191,9 @@ fun AddProductScreen(
                 }
                 Button(onClick = {
                     viewModel.addProduct(
-                        onSuccess = { navigationManager.handleBackPress() },
+                        onSuccess = {
+                            showSuccessMessage = true
+                        },
                         onError = { errorMessage ->
                             scope.launch {
                                 snackbarHostState.showSnackbar(errorMessage)

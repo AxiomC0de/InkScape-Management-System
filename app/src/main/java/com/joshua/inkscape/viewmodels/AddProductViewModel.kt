@@ -94,10 +94,28 @@ class AddProductViewModel : ViewModel() {
                     imageUrl = "" // Image URL is not handled yet
                 )
                 newProductRef.setValue(product).await()
+                clearForm()
                 onSuccess()
             } catch (e: Exception) {
                 onError(e.message ?: "An unknown error occurred.")
             }
         }
+    }
+
+    private fun clearForm() {
+        productName = ""
+        description = ""
+        price = ""
+        quantity = ""
+        lowStockThreshold = ""
+        category = ""
+        isCategoryDropdownExpanded = false
+        
+        // Clear error states
+        productNameError.value = false
+        priceError.value = false
+        quantityError.value = false
+        lowStockThresholdError.value = false
+        categoryError.value = false
     }
 } 
